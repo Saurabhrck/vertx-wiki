@@ -102,7 +102,7 @@ public class MainVerticle extends AbstractVerticle {
             8888,
             ar -> {
               if (ar.succeeded()) {
-                logger.info("Http verticle deployed");
+                logger.info("Http varticle deployed in port 8888");
                 promise.complete();
               } else {
                 logger.error("Http server creation failed", ar.cause());
