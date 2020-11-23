@@ -66,5 +66,4 @@ It generates a _fat-jar_ in the `target` directory.
 java -jar target/vertx-start-project-1.0-SNAPSHOT-fat.jar
 ----
 
-It runs the project standalone
-
+It runs the project stand alone.
