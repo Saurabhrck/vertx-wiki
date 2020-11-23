@@ -13,7 +13,7 @@ Create your project with:
 
 [source]
 ----
-git clone https://github.com/vert-x3/vertx-maven-starter.git PROJECT_NAME
+git clone https://github.com/Saurabhrck/vertx-wiki.git PROJECT_NAME
 ----
 
 Replace `PROJECT_NAME` with the name of your project.
@@ -34,15 +34,15 @@ Once you have retrieved the project, you can check that everything works with:
 mvn test exec:java
 ----
 
-The command compiles the project and runs the tests, then  it launches the application, so you can check by yourself. Open your browser to http://localhost:8080. You should see a _Hello World_ message.
+The command compiles the project and runs the tests, then  it launches the application, so you can check by yourself. Open your browser to http://localhost:8888. You should see a wiki index page message.
 
 == Anatomy of the project
 
 The project contains:
 
 * a `pom.xml` file
-* a _main_ verticle file (src/main/java/io/vertx/starter/MainVerticle.java)
-* an unit test (src/main/test/io/vertx/starter/MainVerticleTest.java)
+* a _main_ verticle file (src/main/java/io/vertx/guides/wiki/MainVerticle.java)
+* an unit test (src/main/test/io/vertx/guides/wiki/MainVerticleTest.java)
 
 == Start to hack
 
@@ -61,3 +61,10 @@ mvn clean package
 ----
 
 It generates a _fat-jar_ in the `target` directory.
+
+----
+java -jar target/vertx-start-project-1.0-SNAPSHOT-fat.jar
+----
+
+It runs the project standalone
+
