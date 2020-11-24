@@ -102,26 +102,28 @@ public class DbConnectionVerticle extends AbstractVerticle {
                 .put("max_pool_size", config().getInteger(CONFIG_WIKI_JDBC_MAX_POOL_SIZE, 30)));
 
     dbClient.getConnection(
-        car -> {
-          if (car.succeeded()) {
-            SQLConnection connection = car.result();
+        ar -> {
+          if (ar.failed()) {
+            logger.error("Could not open a database connection", ar.cause());
+            promise.fail(ar.cause());
+          } else {
+            SQLConnection connection = ar.result();
             connection.execute(
-                (String) queryMap.get(SqlQuery.CREATE_PAGES_TABLE),
-                result -> {
+                queryMap.get(SqlQuery.CREATE_PAGES_TABLE),
+                create -> { // <2>
                   connection.close();
-                  if (result.succeeded()) {
-                    String address = config().getString(CONFIG_WIKIDB_QUEUE, "wikidb.queue");
-                    vertx.eventBus().consumer(address, this::onMesage);
-                    logger.info("DB Verticle registered as {}", address);
-                    promise.complete();
+                  if (create.failed()) {
+                    logger.error("Database preparation error", create.cause());
+                    promise.fail(create.cause());
                   } else {
-                    logger.error("Can not init db cause - ", result.cause());
-                    promise.fail(result.cause());
+                    vertx
+                        .eventBus()
+                        .consumer(
+                            config().getString(CONFIG_WIKIDB_QUEUE, "wikidb.queue"),
+                            this::onMesage); // <3>
+                    promise.complete();
                   }
                 });
-          } else {
-            logger.error("Error creating DB connection cause - ", car.cause());
-            promise.fail(car.cause());
           }
         });
   }
@@ -193,7 +195,7 @@ public class DbConnectionVerticle extends AbstractVerticle {
               jsonObject.put("found", true);
               JsonArray row = resultSet.getResults().get(0);
               jsonObject.put("id", row.getInteger(0));
-              jsonObject.put("content", row.getString(1));
+              jsonObject.put("rawContent", row.getString(1));
             }
             tMessage.reply(jsonObject);
           } else {
@@ -211,7 +213,7 @@ public class DbConnectionVerticle extends AbstractVerticle {
         inputArray,
         result -> {
           if (result.succeeded()) {
-            logger.info("{} Data successfully inserted", content);
+            logger.info("Data successfully inserted with title {}", title);
             tMessage.reply("OK");
           } else {
             handleFailMessage(tMessage, result.cause());
@@ -228,7 +230,8 @@ public class DbConnectionVerticle extends AbstractVerticle {
         inputArray,
         result -> {
           if (result.succeeded()) {
-            logger.info("{} Data successfully updated", content);
+            System.out.println(inputArray.getString(0));
+            logger.info("Data successfully updated with id {}", id);
             tMessage.reply("ok");
           } else {
             handleFailMessage(tMessage, result.cause());

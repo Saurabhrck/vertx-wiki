@@ -145,17 +145,15 @@ public class HttpServerVerticle extends AbstractVerticle {
     String markdown = routingContext.request().getParam("markdown");
     boolean newPage = "Yes".equalsIgnoreCase(routingContext.request().getParam("newPage"));
     JsonObject object = new JsonObject();
-      DeliveryOptions options = new DeliveryOptions();
+    DeliveryOptions options = new DeliveryOptions();
     if (newPage) {
       object.put("title", title);
       object.put("markdown", markdown);
       options.addHeader("action", "insert-wiki-page");
-      logger.info("This is an insert operation");
     } else {
       object.put("markdown", markdown);
       object.put("id", id);
       options.addHeader("action", "update-wiki-page");
-        logger.info("This is an update operation");
     }
     vertx
         .eventBus()
